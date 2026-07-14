@@ -54,12 +54,16 @@ export default function UserMenu({
           </svg>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-48 bg-white rounded-xl shadow-lg border border-black/[0.04] py-1 z-50 overflow-hidden">
-          <DropdownMenuItem asChild><Link href="/dashboard/compte" className="block px-4 py-2 text-sm text-[#1D1D1F] hover:bg-[#F5F5F7] transition-colors font-medium cursor-pointer">{dict.user_menu_my_account}</Link></DropdownMenuItem>
-          <DropdownMenuItem asChild>
-            <Link href="/dashboard/equipe" className="block px-4 py-2 text-sm text-[#1D1D1F] hover:bg-[#F5F5F7] transition-colors font-medium cursor-pointer">{dict.menu_gestion_equipe}</Link>
+          <DropdownMenuItem>
+            <Link href="/dashboard/compte" className="block w-full px-4 py-2 text-sm text-[#1D1D1F] hover:bg-[#F5F5F7] transition-colors font-medium cursor-pointer">{dict.user_menu_my_account}</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Link href="/dashboard/equipe" className="block w-full px-4 py-2 text-sm text-[#1D1D1F] hover:bg-[#F5F5F7] transition-colors font-medium cursor-pointer">{dict.menu_gestion_equipe}</Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator className="bg-gray-100" />
-          <DropdownMenuItem asChild><button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium cursor-pointer">{dict.user_menu_logout}</button></DropdownMenuItem>
+          <DropdownMenuItem>
+            <button onClick={handleLogout} className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors font-medium cursor-pointer">{dict.user_menu_logout}</button>
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           <div className="p-2 text-center text-[10px] text-gray-500">
             <p>© 2026 Janis Botella.</p>
