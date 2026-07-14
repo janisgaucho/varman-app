@@ -212,7 +212,7 @@ export default function ChantierDetailsPage({
       {activeTab === 'taches' && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-start">
           {/* Colonne de Gauche (Liste des Tâches) */}
-          <div className="flex flex-col gap-2 sticky top-28">
+          <div className="flex flex-col gap-2 sticky top-28 md:top-32">
             {tasks.map((task: string, index: number) => (
               <button
                 key={index}
