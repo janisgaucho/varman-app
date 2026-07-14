@@ -1,5 +1,11 @@
 // src/app/legal/cgu/page.tsx
 
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: "Conditions Générales d'Utilisation",
+};
+
 export default async function CGUPage() {
   return (
     <main className="bg-white">

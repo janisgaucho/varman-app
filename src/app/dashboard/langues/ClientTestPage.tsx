@@ -71,7 +71,7 @@ export default function ClientTestPage({ dict }: { dict: any }) {
             <button 
               onClick={handleTranslate}
               disabled={isLoading}
-              className="flex items-center justify-center min-w-[120px] px-5 py-3 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-50"
+              className="flex items-center justify-center min-w-30 px-5 py-3 bg-gray-900 text-white rounded-xl text-sm font-medium hover:bg-gray-800 transition-colors disabled:opacity-50"
             >
               {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : dict.bouton_traduire}
             </button>

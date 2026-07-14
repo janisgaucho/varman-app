@@ -1,5 +1,11 @@
 // src/app/legal/confidentialite/page.tsx
 
+import { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: "Politique de Confidentialité",
+};
+
 export default async function ConfidentialitePage() {
   return (
     <main className="bg-white">

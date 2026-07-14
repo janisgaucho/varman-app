@@ -5,6 +5,11 @@ import FileUploader from './FileUploader'
 import { ArrowLeft } from 'lucide-react'
 import { getDictionary } from '@/lib/dictionary'
 
+import { Metadata } from 'next'
+export const metadata: Metadata = {
+  title: "Nouveau chantier",
+};
+
 export default async function NewProjectPage({
   searchParams,
 }: {
@@ -20,15 +25,14 @@ export default async function NewProjectPage({
         {/* Bouton de retour positionné en absolu et visible uniquement sur les écrans md et plus */}
         <Link href="/dashboard" className="hidden md:inline-flex absolute top-2 -left-32 items-center justify-center gap-2 border rounded-lg px-3 py-1.5 text-sm font-medium text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-all">
           <ArrowLeft className="w-4 h-4" />
-          <span>{dict.bouton_retour}</span>
-        </Link>
+<span>{dict.retour}</span>        </Link>
 
         <div className="mb-6">
           <h1 className="text-[32px] font-semibold tracking-tight text-[#1D1D1F]">{dict.nouveau_chantier_titre}</h1>
           <p className="text-[#86868B] mt-2 font-medium">{dict.nouveau_chantier_description}</p>
         </div>
 
-        <form action={createProject} className="bg-white rounded-[24px] p-8 shadow-sm border border-black/[0.04] flex flex-col gap-6">
+        <form action={createProject} className="bg-white rounded-[24px] p-8 shadow-sm border border-black/4 flex flex-col gap-6">
           
           {message && (
             <p className="p-4 bg-red-50 text-red-600 text-sm font-medium rounded-xl">

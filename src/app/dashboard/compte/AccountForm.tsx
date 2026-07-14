@@ -15,7 +15,7 @@ export function AccountForm({ user, profile, dict, message, successMessage }: { 
   const [isEditing, setIsEditing] = useState(false)
 
   return (
-    <form action={updateProfile} className="bg-white rounded-3xl p-8 shadow-sm border border-black/[0.04] flex flex-col gap-6">
+    <form action={updateProfile} className="bg-white rounded-3xl p-8 shadow-sm border border-black/4 flex flex-col gap-6">
         {message && (
           <p className="p-4 bg-red-50 text-red-600 text-sm font-medium rounded-xl">
             {message}

@@ -28,7 +28,7 @@ export default async function LegalLayout({
     <DictionaryProvider dictionary={dict}>
       <div className="flex flex-col min-h-screen bg-[#F5F5F7]">
         
-        <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-black/[0.04] px-8 md:px-12 py-4 flex justify-between items-center">
+        <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-black/4 px-8 md:px-12 py-4 flex justify-between items-center">
           <Link href="/dashboard" aria-label={dict.layout_return_to_dashboard_label}>
             <div className="flex items-center">
               <img 

@@ -21,25 +21,26 @@ export default async function DashboardLayout({
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('first_name, last_name')
+    .select('first_name, last_name, logo_url')
     .eq('id', user.id)
     .single()
   const dict = await getDictionary();
   const firstName = profile?.first_name || dict.header_default_user
   const lastName = profile?.last_name || ''
+  const logoUrl = profile?.logo_url || '/logo_structur.png'; // Utilise le logo dynamique ou un logo par défaut
   const status = dict.header_user_status
 
   return (
     <DictionaryProvider dictionary={dict}>
       <div className="min-h-screen bg-[#F5F5F7] flex flex-col">
         
-        <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-black/[0.04] px-8 md:px-12 py-4 flex justify-between items-center">
+        <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-black/4 px-8 md:px-12 flex justify-between items-center">
           <Link href="/dashboard" aria-label={dict.layout_return_to_dashboard_label}>
             <div className="flex items-center">
-              <img 
-                src="/logo-varman.webp" 
+              <img
+                src={logoUrl}
                 alt={dict.layout_logo_alt} 
-                className="h-12 object-contain"
+                className="h-20 object-contain"
               />
             </div>
           </Link>

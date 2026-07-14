@@ -3,6 +3,11 @@ import { getEquipe, getProjects } from '@/actions/equipe'
 import { AddUserModal } from './AddUserModal'
 import { DeleteUserButton } from './DeleteUserButton'
 
+import { Metadata } from 'next'
+export const metadata: Metadata = {
+  title: "Gestion d'équipe",
+};
+
 export default async function EquipePage() {
   const dict = await getDictionary()
   const users = await getEquipe()

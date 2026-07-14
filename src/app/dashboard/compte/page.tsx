@@ -1,7 +1,12 @@
+import { Metadata } from 'next'
 import { createClient } from '@/utils/supabase/server'
 import { redirect } from 'next/navigation'
 import { getDictionary } from '@/lib/dictionary'
 import { AccountForm } from './AccountForm'
+
+export const metadata: Metadata = {
+  title: "Mon Compte",
+};
 
 type Profile = {
   id: string;

@@ -53,12 +53,15 @@ export default function UserMenu({
             <circle cx="19" cy="12" r="1"></circle>
           </svg>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48 bg-white rounded-xl shadow-lg border border-black/[0.04] py-1 z-50 overflow-hidden">
+        <DropdownMenuContent align="end" className="w-48 bg-white rounded-xl shadow-lg border border-black/4 py-1 z-50 overflow-hidden">
           <DropdownMenuItem>
             <Link href="/dashboard/compte" className="block w-full px-4 py-2 text-sm text-[#1D1D1F] hover:bg-[#F5F5F7] transition-colors font-medium cursor-pointer">{dict.user_menu_my_account}</Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
             <Link href="/dashboard/equipe" className="block w-full px-4 py-2 text-sm text-[#1D1D1F] hover:bg-[#F5F5F7] transition-colors font-medium cursor-pointer">{dict.menu_gestion_equipe}</Link>
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <Link href="/dashboard/parametres" className="block w-full px-4 py-2 text-sm text-[#1D1D1F] hover:bg-[#F5F5F7] transition-colors font-medium cursor-pointer">{dict.user_menu_settings || 'Paramètres'}</Link>
           </DropdownMenuItem>
           <DropdownMenuSeparator className="bg-gray-100" />
           <DropdownMenuItem>

@@ -46,7 +46,7 @@ export function LanguageSwitcher() {
         <Globe className="w-5 h-5" />
       </DropdownMenuTrigger>
       
-      <DropdownMenuContent align="end" className="bg-white rounded-xl shadow-lg border p-1 min-w-[140px]">
+      <DropdownMenuContent align="end" className="bg-white rounded-xl shadow-lg border p-1 min-w-35">
         {LANGUAGES.map((lang) => (
           <DropdownMenuItem key={lang.code} onClick={() => handleSelect(lang.code)}
             className={`flex items-center justify-between cursor-pointer ${

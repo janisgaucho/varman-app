@@ -18,7 +18,7 @@ export default async function LoginPage({
         <div className="flex flex-col items-center justify-center space-y-4 mb-8">
           <Link href="/">
             <Image 
-              src="/logo-varman.webp"
+              src="/logo_structur.png"
               alt="Varman Rénovation"
               width={200}
               height={56}

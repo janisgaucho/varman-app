@@ -12,6 +12,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 
+import { Metadata } from 'next'
+export const metadata: Metadata = {
+  title: "Dashboard",
+};
+
 export default async function DashboardPage() {
   const supabase = createClient()
   const dict = await getDictionary();
@@ -72,8 +77,8 @@ export default async function DashboardPage() {
                     <DropdownMenuTrigger className="p-1.5 rounded-full text-gray-500 hover:bg-gray-100 hover:text-gray-800 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-200">
                       <MoreVertical className="h-4 w-4" />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-white rounded-xl shadow-lg border p-1 min-w-[160px]">
-                      <DropdownMenuItem asChild className="cursor-pointer text-gray-900 font-normal focus:bg-gray-100 focus:text-gray-900 rounded-lg p-2">
+                    <DropdownMenuContent align="end" className="bg-white rounded-xl shadow-lg border p-1 min-w-40">
+                      <DropdownMenuItem className="cursor-pointer text-gray-900 font-normal focus:bg-gray-100 focus:text-gray-900 rounded-lg p-2">
                         <Link href={`/dashboard/chantier/${project.id}`}>
                           {dict.dashboard_project_card_view}
                         </Link>
