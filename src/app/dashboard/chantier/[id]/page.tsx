@@ -150,8 +150,8 @@ export default function ChantierDetailsPage({
               </div>
               {tasks.length > 0 ? (
                 <div className="space-y-2">
-                  {tasks.map((task, index) => (
-                    <div
+{tasks.map((task: any, index: number) => (
+                      <div
                       key={index}
                       onClick={() => handleTaskClick(index)}
                       className="group flex items-center justify-between p-4 rounded-2xl border border-transparent hover:border-gray-200 hover:bg-gray-50 cursor-pointer transition-all"
