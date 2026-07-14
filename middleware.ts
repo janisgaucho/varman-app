@@ -1,27 +1,48 @@
-import { NextResponse, type NextRequest } from 'next/server';
-import { createClient } from '@/utils/supabase/server';
+import { createServerClient } from '@supabase/ssr'
+import { NextResponse, type NextRequest } from 'next/server'
 
 export async function middleware(request: NextRequest) {
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  })
 
-  // Si l'utilisateur n'est pas connecté et essaie d'accéder à une route /dashboard...
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          response = NextResponse.next({ request })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+
+  const { data: { user } } = await supabase.auth.getUser()
+
+  // Protection des routes
   if (!user && request.nextUrl.pathname.startsWith('/dashboard')) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    return NextResponse.redirect(new URL('/login', request.url))
   }
 
-  // Si l'utilisateur est déjà connecté et essaie d'aller sur /login, on le renvoie au dashboard
   if (user && request.nextUrl.pathname === '/login') {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+    return NextResponse.redirect(new URL('/dashboard', request.url))
   }
 
-  return NextResponse.next();
+  return response
 }
 
-// On définit quelles pages le middleware doit surveiller
 export const config = {
   matcher: [
-    '/dashboard/:path*',
-    '/login',
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
-};
+}
