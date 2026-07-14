@@ -1,23 +1,45 @@
 // src/app/dashboard/compte/actions.ts
 'use server'
 
+import 'server-only'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 
 export async function updateProfile(formData: FormData) {
   const supabase = createClient()
-  
-  // 1. Vérifier l'utilisateur connecté
+
+  const firstName = formData.get('first_name') as string
+  const lastName = formData.get('last_name') as string
+  const newPassword = formData.get('new_password') as string | null
+  const confirmPassword = formData.get('confirm_password') as string | null
+
+  let passwordChanged = false;
+
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) {
     redirect('/login')
   }
 
-  const firstName = formData.get('first_name') as string
-  const lastName = formData.get('last_name') as string
+  // Étape 1: Mettre à jour le mot de passe si fourni
+  if (newPassword) {
+    if (newPassword !== confirmPassword) {
+      redirect('/dashboard/compte?message=Les mots de passe ne correspondent pas.')
+    }
+    if (newPassword.length < 6) {
+      redirect('/dashboard/compte?message=Le mot de passe doit contenir au moins 6 caractères.')
+    }
 
-  // 2. Mettre à jour la table profiles
+    const { error: passwordError } = await supabase.auth.updateUser({ password: newPassword })
+
+    if (passwordError) {
+      console.error('Erreur de mise à jour du mot de passe:', passwordError)
+      redirect(`/dashboard/compte?message=${passwordError.message}`)
+    }
+    passwordChanged = true;
+  }
+
+  // Étape 2: Mettre à jour le profil
   const { error } = await supabase
     .from('profiles')
     .update({
@@ -27,10 +49,12 @@ export async function updateProfile(formData: FormData) {
     .eq('id', user.id)
 
   if (error) {
-    redirect('/dashboard/compte?message=Erreur lors de la mise à jour')
+    console.error('Erreur de mise à jour du profil:', error)
+    redirect(`/dashboard/compte?message=Erreur profil: ${error.message}`)
   }
 
-  // 3. Rafraîchir le cache pour mettre à jour instantanément le header et la page
-  revalidatePath('/dashboard', 'layout')
-  redirect('/dashboard/compte?success=true')
+  revalidatePath('/dashboard/compte')
+  const successMessage = passwordChanged ? "Profil et mot de passe mis à jour avec succès." : "Profil mis à jour avec succès.";
+  // On utilise un message de succès différent pour éviter de le confondre avec le paramètre 'success' booléen
+  redirect(`/dashboard/compte?success_message=${encodeURIComponent(successMessage)}`)
 }
