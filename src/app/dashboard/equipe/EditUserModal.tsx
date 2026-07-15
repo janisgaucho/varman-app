@@ -63,7 +63,7 @@ export function EditUserModal({ user, projects }: { user: User, projects: Projec
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+      <DialogTrigger>
         <button className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
           {dict.equipe_bouton_modifier || 'Modifier'}
         </button>
