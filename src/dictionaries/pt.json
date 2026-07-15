@@ -86,8 +86,12 @@
   "nouveau_chantier_titre": "Novo canteiro de obras",
   "nouveau_chantier_description": "Importe o orçamento para gerar o projeto automaticamente.",
   "nouveau_chantier_bouton_annuler": "Cancelar",
-  "nouveau_chantier_bouton_creer": "Analisar e criar o canteiro de obras",
+  "nouveau_chantier_bouton_creer": "Adicionar",
+  "bouton_retour": "Voltar",
   "nouveau_file_uploader_ready": "Pronto para ser analisado",
   "nouveau_file_uploader_drag_drop": "Arraste seu orçamento em PDF para cá.",
-  "nouveau_file_uploader_browse": "ou clique para navegar pelos seus arquivos"
+  "nouveau_file_uploader_browse": "ou clique para navegar pelos seus arquivos",
+  "footer_copyright": "© 2026 Janis Botella. Todos os direitos reservados.",
+  "footer_cgu": "Termos de Uso",
+  "footer_confidentialite": "Confidencialidade"
 }

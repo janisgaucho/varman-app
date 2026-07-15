@@ -1,9 +1,8 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus } from 'lucide-react'
 import { useDictionary } from '@/components/DictionaryProvider'
-import { addUser } from '@/actions/equipe'
+import { updateUser, deleteUser } from '@/actions/equipe'
 import { Label } from '@/components/ui/label'
 import {
   Dialog,
@@ -27,12 +26,21 @@ type Project = {
   name: string;
 };
 
-export function AddUserModal({ projects }: { projects: Project[] }) {
+type User = {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+  email: string | null;
+  role: string | null;
+};
+
+export function EditUserModal({ user, projects }: { user: User, projects: Project[] }) {
   const dict = useDictionary()
   const [open, setOpen] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const handleFormAction = async (formData: FormData) => {
-    const result = await addUser(formData)
+    const result = await updateUser(user.id, formData)
     if (result?.error) {
       alert(result.error)
     } else {
@@ -40,36 +48,48 @@ export function AddUserModal({ projects }: { projects: Project[] }) {
     }
   }
 
+  const handleDelete = async () => {
+    if (confirm(dict.equipe_confirm_delete || "Êtes-vous sûr de vouloir supprimer cet utilisateur ? Cette action est irréversible.")) {
+      setIsDeleting(true);
+      const result = await deleteUser(user.id);
+      if (result?.error) {
+        alert(result.error);
+      } else {
+        setOpen(false); // Ferme la modale en cas de succès
+      }
+      setIsDeleting(false);
+    }
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <button className="inline-flex items-center justify-center gap-2 bg-[#0071E3] text-white pl-4 pr-5 py-2.5 rounded-full text-sm font-medium hover:bg-[#0077ED] transition-colors shadow-sm">
-          <Plus className="h-4 w-4" />
-          {dict.equipe_bouton_ajouter}
+        <button className="text-blue-600 hover:text-blue-800 font-medium transition-colors">
+          {dict.equipe_bouton_modifier || 'Modifier'}
         </button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{dict.equipe_modal_titre}</DialogTitle>
-          <DialogDescription>{dict.equipe_modal_desc}</DialogDescription>
+          <DialogTitle>{dict.equipe_modal_titre_modifier || "Modifier l'utilisateur"}</DialogTitle>
+          <DialogDescription>{dict.equipe_modal_desc_modifier || "Mettez à jour les informations de l'utilisateur."}</DialogDescription>
         </DialogHeader>
         <form action={handleFormAction}>
           <div className="grid gap-4 py-4">
             <div className="grid gap-2">
               <Label htmlFor="first_name">{dict.equipe_label_prenom}</Label>
-              <input id="first_name" name="first_name" required placeholder={dict.equipe_placeholder_prenom} className="w-full bg-gray-50 border border-gray-200 px-3 py-2 rounded-lg" />
+              <input id="first_name" name="first_name" required defaultValue={user.first_name || ''} className="w-full bg-gray-50 border border-gray-200 px-3 py-2 rounded-lg" />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="last_name">{dict.equipe_label_nom}</Label>
-              <input id="last_name" name="last_name" required placeholder={dict.equipe_placeholder_nom} className="w-full bg-gray-50 border border-gray-200 px-3 py-2 rounded-lg" />
+              <input id="last_name" name="last_name" required defaultValue={user.last_name || ''} className="w-full bg-gray-50 border border-gray-200 px-3 py-2 rounded-lg" />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="email">{dict.equipe_col_email}</Label>
-              <input id="email" name="email" type="email" required placeholder={dict.equipe_placeholder_email} className="w-full bg-gray-50 border border-gray-200 px-3 py-2 rounded-lg" />
+              <input id="email" name="email" type="email" required defaultValue={user.email || ''} className="w-full bg-gray-50 border border-gray-200 px-3 py-2 rounded-lg" />
             </div>
             <div className="grid gap-2">
               <Label htmlFor="role">{dict.equipe_label_role}</Label>
-              <Select name="role" required defaultValue="artisan">
+              <Select name="role" required defaultValue={user.role || 'artisan'}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder={dict.equipe_label_role} />
                 </SelectTrigger>
@@ -93,9 +113,17 @@ export function AddUserModal({ projects }: { projects: Project[] }) {
               </Select>
             </div>
           </div>
-          <DialogFooter>
-            <button type="submit" className="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
-              {dict.equipe_bouton_valider}
+          <DialogFooter className="flex-col-reverse sm:flex-row sm:justify-between sm:items-center w-full">
+            <button
+              type="button"
+              onClick={handleDelete}
+              disabled={isDeleting}
+              className="text-red-600 hover:text-red-800 text-sm font-medium transition-colors disabled:text-gray-400 disabled:cursor-not-allowed mt-2 sm:mt-0"
+            >
+              {isDeleting ? (dict.equipe_bouton_suppression_en_cours || 'Suppression...') : (dict.equipe_bouton_supprimer || 'Supprimer')}
+            </button>
+            <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg">
+              {dict.equipe_bouton_valider_modification || 'Enregistrer les modifications'}
             </button>
           </DialogFooter>
         </form>

@@ -27,7 +27,7 @@ export async function createProject(formData: FormData) {
   try {
     // 4. Initialiser l'IA
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-3.5-flash' });
   
     // 5. Demander une extraction JSON stricte
   const prompt = `Analyse ce devis de travaux et retourne UNIQUEMENT un objet JSON valide avec les clés suivantes :

@@ -21,14 +21,22 @@ export default async function DashboardLayout({
 
   const { data: profile } = await supabase
     .from('profiles')
-    .select('first_name, last_name, logo_url')
+    .select('first_name, last_name, logo_url, role')
     .eq('id', user.id)
     .single()
   const dict = await getDictionary();
   const firstName = profile?.first_name || dict.header_default_user
   const lastName = profile?.last_name || ''
-  const logoUrl = profile?.logo_url || '/logo_structur.png'; // Utilise le logo dynamique ou un logo par défaut
-  const status = dict.header_user_status
+  const logoUrl = profile?.logo_url || `/logo_structur.png`; // Utilise le logo dynamique ou un logo par défaut
+  
+  let status = '';
+  if (profile?.role === 'maitre_oeuvre') {
+    status = dict.role_maitre_oeuvre;
+  } else if (profile?.role === 'artisan') {
+    status = dict.role_artisan;
+  } else if (profile?.role) {
+    status = profile.role; // Affiche la valeur brute si elle n'est pas traduite
+  }
 
   return (
     <DictionaryProvider dictionary={dict}>

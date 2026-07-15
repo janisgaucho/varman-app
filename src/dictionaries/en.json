@@ -43,7 +43,7 @@
   "status_a_venir": "Future",
   "status_en_cours": "In progress",
   "status_termine": "Finished",
-  "account_page_title": "My Account",
+  "account_page_title": "My account",
   "account_page_subtitle": "Manage your personal information and preferences.",
   "account_update_success_message": "✓ Your information has been successfully updated.",
   "account_label_firstname": "First name",
@@ -86,8 +86,12 @@
   "nouveau_chantier_titre": "New construction site",
   "nouveau_chantier_description": "Import the quote to automatically generate the project.",
   "nouveau_chantier_bouton_annuler": "Cancel",
-  "nouveau_chantier_bouton_creer": "Analyze and create the construction site",
+  "nouveau_chantier_bouton_creer": "Add",
+  "bouton_retour": "Back",
   "nouveau_file_uploader_ready": "Ready to be analyzed",
   "nouveau_file_uploader_drag_drop": "Drag your PDF quote here",
-  "nouveau_file_uploader_browse": "or click to browse your files"
+  "nouveau_file_uploader_browse": "or click to browse your files",
+  "footer_copyright": "© 2026 Janis Botella. All rights reserved.",
+  "footer_cgu": "Terms of Use",
+  "footer_confidentialite": "Confidentiality"
 }

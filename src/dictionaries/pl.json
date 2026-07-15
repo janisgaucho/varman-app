@@ -86,8 +86,12 @@
   "nouveau_chantier_titre": "Nowy plac budowy",
   "nouveau_chantier_description": "Zaimportuj wycenę, aby automatycznie wygenerować projekt.",
   "nouveau_chantier_bouton_annuler": "Anulować",
-  "nouveau_chantier_bouton_creer": "Przeanalizuj i stwórz plac budowy",
+  "nouveau_chantier_bouton_creer": "Dodać",
+  "bouton_retour": "Z powrotem",
   "nouveau_file_uploader_ready": "Gotowy do analizy",
   "nouveau_file_uploader_drag_drop": "Przeciągnij tutaj swoją wycenę w formacie PDF",
-  "nouveau_file_uploader_browse": "lub kliknij, aby przeglądać pliki"
+  "nouveau_file_uploader_browse": "lub kliknij, aby przeglądać pliki",
+  "footer_copyright": "© 2026 Janis Botella. Wszelkie prawa zastrzeżone.",
+  "footer_cgu": "Warunki korzystania",
+  "footer_confidentialite": "Poufność"
 }

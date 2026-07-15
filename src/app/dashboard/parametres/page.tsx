@@ -2,6 +2,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client"; // Ajuste ce chemin selon ton projet
 
@@ -118,91 +119,105 @@ Détail : ${errorMessage}`);
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-8">Paramètres de l'espace</h1>
+    <div className="relative w-full min-h-screen bg-gray-50 pt-8 pb-12">
+      <button
+        onClick={() => router.back()}
+        className="absolute left-4 sm:left-6 lg:left-8 top-8 flex items-center gap-2 text-gray-500 hover:text-gray-900 hover:bg-gray-200 transition-colors px-3 py-2 rounded-md cursor-pointer w-fit z-10"
+        aria-label="Retour à la page précédente"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        <span>Retour</span>
+      </button>
 
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-6 border-b border-gray-200 bg-gray-50">
-          <h2 className="text-lg font-medium text-gray-900">Personnalisation</h2>
-          <p className="mt-1 text-sm text-gray-500">
-            Adaptez l'interface aux couleurs de votre entreprise.
-          </p>
+      <div className="w-full max-w-4xl mx-auto px-4 flex flex-col">
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900 text-left mb-1">Paramètres de l'espace</h1>
+          <p className="text-gray-500 text-left mb-8">Gérez les informations et l'apparence de votre espace de travail.</p>
         </div>
 
-        <div className="p-6 space-y-8">
-          
-          {/* Upload du Logo */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Logo de l'entreprise
-            </label>
-            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-gray-400 transition-colors">
-              <div className="space-y-4 text-center w-full">
-                {logoPreview && (
-                  <div className="flex justify-center mb-4">
-                    <img src={logoPreview} alt="Aperçu du logo" className="h-20 object-contain" />
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden w-full">
+          <div className="p-6 border-b border-gray-200 bg-gray-50">
+            <h2 className="text-lg font-medium text-gray-900">Personnalisation</h2>
+            <p className="mt-1 text-sm text-gray-500">
+              Adaptez l'interface aux couleurs de votre entreprise.
+            </p>
+          </div>
+
+          <div className="p-6 space-y-8">
+            
+            {/* Upload du Logo */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Logo de l'entreprise
+              </label>
+              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-gray-400 transition-colors">
+                <div className="space-y-4 text-center w-full">
+                  {logoPreview && (
+                    <div className="flex justify-center mb-4">
+                      <img src={logoPreview} alt="Aperçu du logo" className="h-20 object-contain" />
+                    </div>
+                  )}
+                  
+                  <div className="flex text-sm text-gray-600 justify-center">
+                    <label htmlFor="logo-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">
+                      <span>{logoPreview ? "Changer l'image" : "Téléverser un fichier"}</span>
+                      <input 
+                        id="logo-upload" 
+                        name="logo-upload" 
+                        type="file" 
+                        className="sr-only" 
+                        accept="image/png, image/jpeg, image/svg+xml, image/webp" 
+                        onChange={handleLogoChange}
+                      />
+                    </label>
                   </div>
-                )}
-                
-                <div className="flex text-sm text-gray-600 justify-center">
-                  <label htmlFor="logo-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">
-                    <span>{logoPreview ? "Changer l'image" : "Téléverser un fichier"}</span>
-                    <input 
-                      id="logo-upload" 
-                      name="logo-upload" 
-                      type="file" 
-                      className="sr-only" 
-                      accept="image/png, image/jpeg, image/svg+xml, image/webp" 
-                      onChange={handleLogoChange}
-                    />
-                  </label>
+                  <p className="text-xs text-gray-500">PNG, JPG, SVG ou WEBP jusqu'à 2MB</p>
                 </div>
-                <p className="text-xs text-gray-500">PNG, JPG, SVG ou WEBP jusqu'à 2MB</p>
               </div>
             </div>
-          </div>
 
-          {/* Upload du Favicon */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Favicon (Icône de l'onglet)
-            </label>
-            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-gray-400 transition-colors">
-              <div className="space-y-4 text-center w-full">
-                {faviconPreview && (
-                  <div className="flex justify-center mb-4">
-                    <img src={faviconPreview} alt="Aperçu du favicon" className="h-10 w-10 object-contain rounded-md shadow-sm border border-gray-200" />
+            {/* Upload du Favicon */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Favicon (Icône de l'onglet)
+              </label>
+              <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-lg hover:border-gray-400 transition-colors">
+                <div className="space-y-4 text-center w-full">
+                  {faviconPreview && (
+                    <div className="flex justify-center mb-4">
+                      <img src={faviconPreview} alt="Aperçu du favicon" className="h-10 w-10 object-contain rounded-md shadow-sm border border-gray-200" />
+                    </div>
+                  )}
+
+                  <div className="flex text-sm text-gray-600 justify-center">
+                    <label htmlFor="favicon-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">
+                      <span>{faviconPreview ? "Changer l'image" : "Téléverser un fichier"}</span>
+                      <input 
+                        id="favicon-upload" 
+                        name="favicon-upload" 
+                        type="file" 
+                        className="sr-only" 
+                        accept="image/png, image/x-icon, image/webp" 
+                        onChange={handleFaviconChange}
+                      />
+                    </label>
                   </div>
-                )}
-
-                <div className="flex text-sm text-gray-600 justify-center">
-                  <label htmlFor="favicon-upload" className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none">
-                    <span>{faviconPreview ? "Changer l'image" : "Téléverser un fichier"}</span>
-                    <input 
-                      id="favicon-upload" 
-                      name="favicon-upload" 
-                      type="file" 
-                      className="sr-only" 
-                      accept="image/png, image/x-icon, image/webp" 
-                      onChange={handleFaviconChange}
-                    />
-                  </label>
+                  <p className="text-xs text-gray-500">Fichier carré recommandé (PNG, ICO, WEBP).</p>
                 </div>
-                <p className="text-xs text-gray-500">Fichier carré recommandé (PNG, ICO, WEBP).</p>
               </div>
             </div>
-          </div>
 
-          <div className="pt-4">
-            <button 
-              onClick={handleSaveChanges}
-              disabled={isSaving || (!logoFile && !faviconFile)}
-              className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-            >
-              {isSaving ? "Enregistrement..." : "Enregistrer les modifications"}
-            </button>
-          </div>
+            <div className="pt-4">
+              <button 
+                onClick={handleSaveChanges}
+                disabled={isSaving || (!logoFile && !faviconFile)}
+                className="bg-gray-900 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+              >
+                {isSaving ? "Enregistrement..." : "Enregistrer les modifications"}
+              </button>
+            </div>
 
+          </div>
         </div>
       </div>
     </div>

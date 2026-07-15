@@ -1,16 +1,29 @@
 'use server'
 
 import { createClient } from "@/utils/supabase/server";
+import { createClient as createAdminClient } from '@supabase/supabase-js';
 import { revalidatePath } from "next/cache";
 
 /**
  * Récupère tous les profils utilisateurs depuis la base de données.
  */
 export async function getEquipe() {
-  const supabase = createClient();
-  const { data, error } = await supabase
+  const supabase = createClient(); // Client standard pour la session
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return []; // Si pas d'utilisateur, pas d'équipe à montrer
+  }
+
+  const supabaseAdmin = createAdminClient( // Client admin pour lire les données
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const { data, error } = await supabaseAdmin
     .from('profiles')
-    .select('*');
+    .select('*')
+    .eq('created_by', user.id); // Filtre pour ne voir que les utilisateurs créés par le manager
 
   if (error) {
     console.error("Erreur Supabase [getEquipe]:", error);
@@ -23,7 +36,10 @@ export async function getEquipe() {
  * Récupère tous les projets pour les menus de sélection.
  */
 export async function getProjects() {
-  const supabase = createClient();
+  const supabase = createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
   const { data, error } = await supabase
     .from('projects')
     .select('id, name')
@@ -41,24 +57,26 @@ export async function getProjects() {
  * Nécessite les droits d'administration (service_role).
  */
 export async function addUser(formData: FormData) {
-  // NOTE: Cette action nécessite un client Supabase avec les droits d'administration
-  // pour pouvoir créer des utilisateurs. Assurez-vous que SUPABASE_SERVICE_ROLE_KEY
-  // est défini dans vos variables d'environnement.
-  const supabase = createClient();
+  const supabase = createClient(); // Client standard pour la session
+  const { data: { user } } = await supabase.auth.getUser();
+
+  if (!user) {
+    return { error: "Non autorisé" };
+  }
+
+  const supabaseAdmin = createAdminClient( // Client admin pour les opérations privilégiées
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
 
   const email = formData.get('email') as string;
-  const password = Math.random().toString(36).slice(-8); // Génère un mot de passe temporaire
   const firstName = formData.get('first_name') as string;
   const lastName = formData.get('last_name') as string;
   const role = formData.get('role') as string;
   const projectId = formData.get('project_id') as string | null;
 
   // Étape 1: Créer l'utilisateur dans Supabase Auth
-  const { data: authData, error: authError } = await supabase.auth.admin.createUser({
-    email,
-    password,
-    email_confirm: true, // Marque l'email comme vérifié
-  });
+  const { data: authData, error: authError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email);
 
   if (authError || !authData.user) {
     console.error("Erreur Supabase Auth [addUser]:", authError);
@@ -66,13 +84,17 @@ export async function addUser(formData: FormData) {
   }
 
   // Étape 2: Créer le profil correspondant dans la table 'profiles'
-  const { error: profileError } = await supabase
+  const { error: profileError } = await supabaseAdmin
     .from('profiles')
-    .insert({
+    .upsert({
       id: authData.user.id,
       first_name: firstName,
       last_name: lastName,
       role: role,
+      email: email, // Assurer la cohérence de l'email dans le profil
+      created_by: user.id, // Lier le nouveau profil au manager
+    }, {
+      onConflict: 'id' // Précise que le conflit est sur la colonne 'id'
     });
 
   if (profileError) {
@@ -83,7 +105,7 @@ export async function addUser(formData: FormData) {
 
   // Étape 3: Si un chantier est sélectionné, lier l'utilisateur au chantier
   if (projectId) {
-    const { error: memberError } = await supabase
+    const { error: memberError } = await supabaseAdmin
       .from('project_members')
       .insert({
         project_id: projectId,
@@ -102,14 +124,85 @@ export async function addUser(formData: FormData) {
 }
 
 /**
+ * Met à jour le profil d'un utilisateur existant.
+ * Nécessite les droits d'administration (service_role).
+ */
+export async function updateUser(userId: string, formData: FormData) {
+  const supabaseAdmin = createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return { error: "La clé de service Supabase n'est pas configurée côté serveur." };
+  }
+
+  const email = formData.get('email') as string;
+  const firstName = formData.get('first_name') as string;
+  const lastName = formData.get('last_name') as string;
+  const role = formData.get('role') as string;
+  const projectId = formData.get('project_id') as string | null;
+
+  // Étape 1: Mettre à jour le profil dans la table 'profiles'
+  const { error: profileError } = await supabaseAdmin
+    .from('profiles')
+    .update({
+      first_name: firstName,
+      last_name: lastName,
+      role: role,
+      email: email, // On met aussi à jour l'email dans le profil pour la cohérence
+    })
+    .eq('id', userId);
+
+  if (profileError) {
+    console.error("Erreur Supabase Profile [updateUser]:", profileError);
+    return { error: profileError.message || "Erreur lors de la mise à jour du profil." };
+  }
+
+  // Étape 2: Mettre à jour l'email dans Supabase Auth
+  const { error: authError } = await supabaseAdmin.auth.admin.updateUserById(userId, { email });
+
+  if (authError) {
+    console.error("Erreur Supabase Auth [updateUser]:", authError);
+    return { error: authError.message || "Erreur lors de la mise à jour de l'email." };
+  }
+
+  // Étape 3: Gérer l'assignation au chantier
+  if (projectId) {
+    const { error: memberError } = await supabaseAdmin
+      .from('project_members')
+      .upsert(
+        {
+          project_id: projectId,
+          user_id: userId,
+          role: role,
+        },
+        { onConflict: 'user_id' } // Si l'utilisateur est déjà assigné, met à jour son chantier.
+      );
+
+    if (memberError) {
+      console.error("Erreur Supabase [updateUser project assignment]:", memberError);
+      return { error: "Erreur lors de l'assignation au chantier." };
+    }
+  }
+
+  revalidatePath('/dashboard/equipe');
+  return { success: true };
+}
+
+/**
  * Supprime un utilisateur (auth et profil).
  * Nécessite les droits d'administration (service_role).
  */
 export async function deleteUser(userId: string) {
-  // NOTE: Cette action nécessite un client Supabase avec les droits d'administration.
-  const supabase = createClient();
+  const supabaseAdmin = createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+  if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    return { error: "La clé de service Supabase n'est pas configurée côté serveur." };
+  }
 
-  const { error } = await supabase.auth.admin.deleteUser(userId);
+  const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
 
   if (error) {
     console.error("Erreur Supabase Auth [deleteUser]:", error);

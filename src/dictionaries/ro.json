@@ -86,8 +86,12 @@
   "nouveau_chantier_titre": "Șantier nou",
   "nouveau_chantier_description": "Importați cotația pentru a genera automat proiectul.",
   "nouveau_chantier_bouton_annuler": "Anula",
-  "nouveau_chantier_bouton_creer": "Analizați și creați șantierul",
+  "nouveau_chantier_bouton_creer": "Adăuga",
+  "bouton_retour": "Spate",
   "nouveau_file_uploader_ready": "Gata de analizat",
   "nouveau_file_uploader_drag_drop": "Trageți oferta dvs. PDF aici",
-  "nouveau_file_uploader_browse": "sau faceți clic pentru a răsfoi fișierele"
+  "nouveau_file_uploader_browse": "sau faceți clic pentru a răsfoi fișierele",
+  "footer_copyright": "© 2026 Janis Botella. Toate drepturile rezervate.",
+  "footer_cgu": "Termeni de utilizare",
+  "footer_confidentialite": "Confidențialitate"
 }
