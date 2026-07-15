@@ -6,6 +6,63 @@ import { GoogleGenerativeAI } from '@google/generative-ai'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 
+/**
+ * Fonction utilitaire pour attendre un certain temps.
+ * @param ms - Le temps d'attente en millisecondes.
+ */
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+/**
+ * Analyse un devis PDF avec une stratégie de tentatives et de fallback.
+ * Tente d'utiliser 'gemini-3.5-flash' et bascule sur 'gemini-3.5-flash-lite' en cas d'échecs répétés (503).
+ * @param base64Data - Le contenu du fichier en Base64.
+ * @param mimeType - Le type MIME du fichier (ex: 'application/pdf').
+ * @returns Le résultat de l'analyse par l'IA.
+ */
+async function analyzeWithRetry(base64Data: string, mimeType: string) {
+  const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
+  const primaryModel = genAI.getGenerativeModel({ model: 'gemini-3.5-flash' });
+  const fallbackModel = genAI.getGenerativeModel({ model: 'gemini-3.1-flash-lite' });
+
+  const prompt = `Analyse ce devis de travaux et retourne UNIQUEMENT un objet JSON valide avec les clés suivantes :
+  - "reference" (ex: D-260449)
+  - "client_name" (Le nom de famille ou l'entreprise, ex: NGO)
+  - "client_address" (L'adresse d'intervention complète, ex: 4 Allée Bougainville 77200 Torcy France)
+  - "tasks" (Un tableau de chaînes de caractères listant uniquement la désignation de chaque ligne de travaux du tableau, ex: ["Dépose papiers peint, enduit...", "Pose de carrelage au sol"])
+  - "total_ttc" (Le montant total TTC, ex: 429,00)
+  Ne renvoie aucun autre texte, pas de balises markdown, uniquement le JSON pur.`;
+
+  const contentRequest = [prompt, { inlineData: { data: base64Data, mimeType } }];
+
+  let retries = 3;
+  let currentDelay = 1000;
+
+  while (retries > 0) {
+    try {
+      console.log(`Tentative d'appel à gemini-3.5-flash. Essais restants: ${retries}`);
+      const result = await primaryModel.generateContent(contentRequest);
+      console.log("✅ Devis analysé avec succès par : gemini-3.5-flash");
+      return result;
+    } catch (error: any) {
+      if (error.message.includes('503')) {
+        retries--;
+        if (retries === 0) break; // Sortir de la boucle pour utiliser le fallback
+        console.warn(`Erreur 503. Nouvelle tentative dans ${currentDelay}ms...`);
+        await delay(currentDelay);
+        currentDelay *= 2; // Double le délai pour la prochaine tentative
+      } else {
+        throw error; // Si ce n'est pas une erreur 503, on la rejette immédiatement
+      }
+    }
+  }
+
+  // Si toutes les tentatives ont échoué, on utilise le modèle de secours
+  console.log("Les tentatives sur le modèle principal ont échoué. Basculement sur gemini-3.1-flash-lite.");
+  const result = await fallbackModel.generateContent(contentRequest);
+  console.log("⚠️ Devis analysé in extremis par le modèle de secours : gemini-3.1-flash-lite");
+  return result;
+}
+
 export async function createProject(formData: FormData) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -25,30 +82,9 @@ export async function createProject(formData: FormData) {
   const base64Data = buffer.toString('base64');
   
   try {
-    // 4. Initialiser l'IA
-    const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-    const model = genAI.getGenerativeModel({ model: 'gemini-3.5-flash' });
-  
-    // 5. Demander une extraction JSON stricte
-  const prompt = `Analyse ce devis de travaux et retourne UNIQUEMENT un objet JSON valide avec les clés suivantes :
-  - "reference" (ex: D-260449)
-  - "client_name" (Le nom de famille ou l'entreprise, ex: NGO)
-  - "client_address" (L'adresse d'intervention complète, ex: 4 Allée Bougainville 77200 Torcy France)
-  - "tasks" (Un tableau de chaînes de caractères listant uniquement la désignation de chaque ligne de travaux du tableau, ex: ["Dépose papiers peint, enduit...", "Pose de carrelage au sol"])
-  - "total_ttc" (Le montant total TTC, ex: 429,00)
-  Ne renvoie aucun autre texte, pas de balises markdown, uniquement le JSON pur.`;
-  
-    const result = await model.generateContent([
-      prompt,
-      {
-        inlineData: {
-          data: base64Data,
-          mimeType: 'application/pdf'
-        }
-      }
-    ]);
-  
-    // 6. Nettoyer et parser la réponse JSON
+    // Appel à l'IA avec la nouvelle logique de tentatives
+    const result = await analyzeWithRetry(base64Data, 'application/pdf');
+
     const rawText = result.response.text();
     const cleanJson = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
     const extractedData = JSON.parse(cleanJson);

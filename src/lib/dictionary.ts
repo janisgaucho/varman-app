@@ -18,3 +18,5 @@ export async function getDictionary() {
   }
   return dictionaries.fr();
 }
+
+export type Dictionary = Awaited<ReturnType<typeof getDictionary>>;
